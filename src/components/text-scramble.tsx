@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+const CHARS = "01_-~=+<>|/\\{}[]";
 
 interface TextScrambleProps {
   text: string;
@@ -16,8 +16,8 @@ interface TextScrambleProps {
 export default function TextScramble({
   text,
   className = "",
-  delay = 0,
-  speed = 30,
+  delay = 100,
+  speed = 18,
 }: TextScrambleProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
@@ -37,61 +37,59 @@ export default function TextScramble({
       setStarted(true);
       return;
     }
-    const timer = setTimeout(() => setStarted(true), delay);
+    const timer = setTimeout(() => setStarted(true), Math.min(delay, 100));
     return () => clearTimeout(timer);
   }, [inView, delay, reduced, started, text]);
 
-  // Resolve characters left to right
+  // Resolve characters left to right with weighted timing
   useEffect(() => {
     if (!started || done || reduced) return;
-    let resolveIndex = 0;
-    const interval = setInterval(() => {
-      // Skip spaces
-      while (resolveIndex < text.length && text[resolveIndex] === " ") {
-        resolveIndex++;
+
+    // Build schedule: char index -> delay from start
+    const schedule: { index: number; time: number }[] = [];
+    let cumulative = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === " ") continue;
+      if (i === 0) {
+        cumulative = 50; // first char resolves at 50ms
+      } else if (i === 1) {
+        cumulative = 80; // second char at 80ms
+      } else {
+        cumulative += speed;
       }
-      if (resolveIndex >= text.length) {
-        setDone(true);
-        clearInterval(interval);
-        return;
-      }
-      setResolved((prev) => {
-        const next = [...prev];
-        next[resolveIndex] = true;
-        return next;
-      });
-      setDisplay((prev) => {
-        const next = [...prev];
-        next[resolveIndex] = text[resolveIndex];
-        return next;
-      });
-      resolveIndex++;
-    }, speed);
-    return () => clearInterval(interval);
+      schedule.push({ index: i, time: cumulative });
+    }
+
+    const timers = schedule.map(({ index, time }) =>
+      setTimeout(() => {
+        setResolved((prev) => {
+          const next = [...prev];
+          next[index] = true;
+          return next;
+        });
+        setDisplay((prev) => {
+          const next = [...prev];
+          next[index] = text[index];
+          return next;
+        });
+        // Check if this is the last one
+        if (index === schedule[schedule.length - 1].index) {
+          setDone(true);
+        }
+      }, time)
+    );
+
+    return () => timers.forEach(clearTimeout);
   }, [started, done, text, speed, reduced]);
 
   // Cycle unresolved chars
   const rafRef = useRef<number>(0);
-  const cycleUnresolved = useCallback(() => {
-    if (done) return;
-    setDisplay((prev) =>
-      prev.map((ch, i) => {
-        if (resolved[i] || text[i] === " ") return text[i];
-        return CHARS[Math.floor(Math.random() * CHARS.length)];
-      })
-    );
-    rafRef.current = requestAnimationFrame(cycleCallback);
-  }, [done, resolved, text]);
-
-  const cycleCallback = useCallback(() => {
-    cycleUnresolved();
-  }, [cycleUnresolved]);
 
   useEffect(() => {
     if (!started || done) return;
     let lastTime = 0;
     const animate = (time: number) => {
-      if (time - lastTime > 50) {
+      if (time - lastTime > 40) {
         setDisplay((prev) =>
           prev.map((ch, i) => {
             if (resolved[i] || text[i] === " ") return text[i];
@@ -111,8 +109,15 @@ export default function TextScramble({
       {display.map((ch, i) => (
         <span
           key={i}
-          className={resolved[i] ? "" : "text-muted"}
-          style={{ transition: "color 0.1s" }}
+          style={
+            resolved[i]
+              ? { transition: "opacity 0.15s" }
+              : {
+                  fontFamily: "'JetBrains Mono', monospace",
+                  opacity: 0.4,
+                  transition: "opacity 0.15s, font-family 0.1s",
+                }
+          }
         >
           {ch}
         </span>

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
 import AnimatedCounter from "@/components/animated-counter";
+import HeroVisual from "@/components/hero-visual";
 
 const stats = [
   { value: 12, suffix: "+", label: "AI projects shipped" },
@@ -87,55 +88,62 @@ export default function HomePage() {
           }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-6"
-          >
-            <span className="section-label">AI Engineering Studio · Muscat · Srinagar · Kuala Lumpur</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="font-heading text-display-sm md:text-display leading-tight mb-6"
-          >
-            Enterprise AI systems,{" "}
-            <span className="gradient-text-accent">engineered.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="text-muted text-body-lg max-w-2xl mx-auto mb-10"
-          >
-            We design, build, and deploy production-grade Claude-powered systems — agents, RAG, and automation — for the enterprises shaping the GCC.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.7 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              href="/contact?intent=prototype"
-              className="glow-button px-8 py-3.5 rounded-xl font-medium text-sm flex items-center gap-2"
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-center md:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-6"
             >
-              Request a prototype
-              <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/projects"
-              className="px-8 py-3.5 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-bright hover:text-foreground transition-all"
+              <span className="section-label">AI Engineering Studio · Muscat · Srinagar · Kuala Lumpur</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="font-heading text-display-sm md:text-display leading-tight mb-6"
             >
-              View projects
-            </Link>
-          </motion.div>
+              Enterprise AI systems,{" "}
+              <span className="gradient-text-accent">engineered.</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="text-muted text-body-lg max-w-2xl mb-10"
+            >
+              We design, build, and deploy production-grade Claude-powered systems — agents, RAG, and automation — for the enterprises shaping the GCC.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7 }}
+              className="flex flex-col sm:flex-row items-center md:items-start gap-4"
+            >
+              <Link
+                href="/contact?intent=prototype"
+                className="glow-button px-8 py-3.5 rounded-xl font-medium text-sm flex items-center gap-2"
+              >
+                Request a prototype
+                <ArrowRight size={16} />
+              </Link>
+              <Link
+                href="/projects"
+                className="px-8 py-3.5 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-bright hover:text-foreground transition-all"
+              >
+                View projects
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Hero visual — hidden on mobile */}
+          <div className="hidden md:flex items-center justify-center">
+            <HeroVisual />
+          </div>
         </div>
 
         {/* Bottom gradient fade */}
@@ -157,6 +165,36 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── TRUST STRIP ─── */}
+      <section className="py-16 border-y border-border">
+        <div className="max-w-7xl mx-auto px-6">
+          <FadeIn>
+            <p className="text-center text-xs font-mono text-muted-dim uppercase tracking-widest mb-10">
+              Trusted by teams at
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+              {[
+                { name: "Ooredoo", width: "w-28" },
+                { name: "Anthropic", width: "w-24" },
+                { name: "Luban Tours", width: "w-28" },
+              ].map((logo) => (
+                <div
+                  key={logo.name}
+                  className={`${logo.width} h-8 flex items-center justify-center`}
+                >
+                  <span className="text-muted/40 font-heading font-semibold text-lg tracking-wide">
+                    {logo.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-xs text-muted-dim mt-8">
+              Anthropic Claude Partner Network · Production systems across 6 industries
+            </p>
+          </FadeIn>
         </div>
       </section>
 

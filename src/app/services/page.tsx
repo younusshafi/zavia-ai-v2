@@ -64,10 +64,10 @@ export default function ServicesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <StaggerContainer className="space-y-5" staggerDelay={0.1}>
-            {services.map((s) => (
+            {services.map((s, i) => (
               <StaggerItem key={s.title}>
-                <div className="glass-card-hover rounded-2xl p-8 md:p-10">
-                  <div className="flex flex-col md:flex-row md:items-start gap-6">
+                <div className="glass-card-hover rounded-2xl p-8 md:p-10 border-l-2 border-accent/30">
+                  <div className={`flex flex-col md:items-start gap-6 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
                     <div className="w-12 h-12 rounded-xl bg-accent-subtle flex items-center justify-center shrink-0">
                       <s.icon size={24} className="text-accent" />
                     </div>

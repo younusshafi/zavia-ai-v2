@@ -64,18 +64,18 @@ export default function IndustriesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.08}>
-            {industries.map((ind) => (
-              <StaggerItem key={ind.title}>
-                <div className="glass-card-hover rounded-2xl p-8 h-full flex flex-col">
+            {industries.map((ind, i) => (
+              <StaggerItem key={ind.title} className={i === 0 ? "md:col-span-2 lg:col-span-2" : ""}>
+                <div className={`glass-card-hover rounded-2xl p-8 h-full flex flex-col ${i === 0 ? "bg-accent-subtle" : ""}`}>
                   <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center mb-5">
                     <ind.icon size={20} className="text-accent" />
                   </div>
-                  <h3 className="font-heading text-h3 text-foreground mb-2">{ind.title}</h3>
-                  <p className="text-muted text-sm leading-relaxed flex-1 mb-5">{ind.desc}</p>
-                  <div className="space-y-1.5">
+                  <h3 className={`font-heading text-foreground mb-2 ${i === 0 ? "text-h2" : "text-h3"}`}>{ind.title}</h3>
+                  <p className={`text-muted leading-relaxed flex-1 mb-5 ${i === 0 ? "text-body" : "text-sm"}`}>{ind.desc}</p>
+                  <div className={i === 0 ? "flex flex-wrap gap-3" : "space-y-1.5"}>
                     {ind.examples.map((ex) => (
-                      <div key={ex} className="flex items-center gap-2 text-xs text-muted-dim">
-                        <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
+                      <div key={ex} className={`flex items-center gap-2 text-xs text-muted-dim ${i === 0 ? "tech-tag" : ""}`}>
+                        {i !== 0 && <span className="w-1 h-1 rounded-full bg-accent shrink-0" />}
                         {ex}
                       </div>
                     ))}

@@ -19,7 +19,7 @@
     overflow-x: hidden;
   }
   ::selection {
-    background: rgba(94, 106, 210, 0.3);
+    background: rgba(104, 114, 214, 0.3);
     color: #fff;
   }
 }
@@ -33,7 +33,7 @@
   }
 
   .gradient-text-accent {
-    background: linear-gradient(135deg, #5E6AD2 0%, #7B85E0 50%, #34D399 100%);
+    background: linear-gradient(135deg, #6872D6 0%, #8B93E5 50%, #34D399 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -56,9 +56,9 @@
 
   .glass-card-hover:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(94, 106, 210, 0.2);
+    border-color: rgba(104, 114, 214, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(94, 106, 210, 0.08);
+    box-shadow: 0 8px 32px rgba(104, 114, 214, 0.08);
   }
 
   .glass-nav {
@@ -70,7 +70,7 @@
 
   .glow-button {
     position: relative;
-    background: #5E6AD2;
+    background: #6872D6;
     color: white;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -80,7 +80,7 @@
     content: '';
     position: absolute;
     inset: -2px;
-    background: linear-gradient(135deg, #5E6AD2, #7B85E0, #34D399);
+    background: linear-gradient(135deg, #6872D6, #8B93E5, #34D399);
     border-radius: inherit;
     z-index: -1;
     opacity: 0;
@@ -89,7 +89,7 @@
 
   .glow-button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 24px rgba(94, 106, 210, 0.4);
+    box-shadow: 0 4px 24px rgba(104, 114, 214, 0.4);
   }
 
   .glow-button:hover::before {
@@ -101,7 +101,7 @@
     font-size: 0.8125rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #5E6AD2;
+    color: #6872D6;
   }
 
   .ambient-blob {
@@ -134,9 +134,9 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem;
     border-radius: 999px;
-    background: rgba(94, 106, 210, 0.08);
-    color: #7B85E0;
-    border: 1px solid rgba(94, 106, 210, 0.15);
+    background: rgba(104, 114, 214, 0.08);
+    color: #8B93E5;
+    border: 1px solid rgba(104, 114, 214, 0.15);
   }
 }
 

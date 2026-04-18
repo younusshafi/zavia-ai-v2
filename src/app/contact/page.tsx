@@ -10,6 +10,8 @@ function ContactForm() {
   const searchParams = useSearchParams();
   const intent = searchParams.get("intent");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,12 +20,23 @@ function ContactForm() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, wire this to an API route or n8n webhook
-    const mailtoBody = `Name: ${formData.name}%0ACompany: ${formData.company}%0AType: ${formData.type}%0A%0A${formData.message}`;
-    window.open(`mailto:younus@zavia-ai.com?subject=Zavia-AI Inquiry: ${formData.type}&body=${mailtoBody}`);
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error("Failed to send");
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again or email us directly at younus@zavia-ai.com");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -107,10 +120,15 @@ function ContactForm() {
 
       <button
         type="submit"
-        className="glow-button w-full px-8 py-3.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2"
+        disabled={loading}
+        className="glow-button w-full px-8 py-3.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        Send message <Send size={16} />
+        {loading ? "Sending..." : "Send message"} {!loading && <Send size={16} />}
       </button>
+
+      {error && (
+        <p className="text-sm text-red-400 text-center mt-2">{error}</p>
+      )}
     </form>
   );
 }
@@ -187,6 +205,17 @@ export default function ContactPage() {
                 <div className="glass-card rounded-2xl p-8">
                   <h3 className="font-heading text-h3 text-foreground mb-2">Response time</h3>
                   <p className="text-muted text-sm">We respond within 24 hours. Prototype plans delivered within 48 hours of initial call.</p>
+                </div>
+              </FadeIn>
+
+              <FadeIn delay={0.4}>
+                <div className="glass-card rounded-2xl p-8">
+                  <h3 className="font-heading text-h3 text-foreground mb-2">Trust</h3>
+                  <div className="space-y-2 text-sm text-muted">
+                    <p>&#10003; Anthropic Claude Partner Network</p>
+                    <p>&#10003; 12+ AI systems shipped</p>
+                    <p>&#10003; Production deployments across GCC</p>
+                  </div>
                 </div>
               </FadeIn>
             </div>

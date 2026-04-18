@@ -1,6 +1,6 @@
 "use client";
 
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
+import { FadeIn } from "@/components/motion";
 import { Brain, Database, Workflow, Eye, Shield, Gauge } from "lucide-react";
 
 const layers = [
@@ -62,20 +62,41 @@ export default function ArchitecturePage() {
       </section>
 
       <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <StaggerContainer className="space-y-5" staggerDelay={0.08}>
-            {layers.map((l, i) => (
-              <StaggerItem key={l.title}>
-                <div className="glass-card-hover rounded-2xl p-8 md:p-10">
-                  <div className="flex flex-col md:flex-row md:items-start gap-6">
-                    <div className="flex items-center gap-4 shrink-0">
-                      <span className="font-mono text-accent text-sm w-6">{String(i + 1).padStart(2, "0")}</span>
-                      <div className="w-12 h-12 rounded-xl bg-accent-subtle flex items-center justify-center">
-                        <l.icon size={24} className="text-accent" />
+        <div className="max-w-5xl mx-auto px-6">
+          {/* Pipeline layout */}
+          <div className="relative">
+            {/* Vertical glowing line */}
+            <div className="absolute left-6 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-accent/60 via-accent/30 to-accent/10" />
+            <div className="absolute left-6 md:left-8 top-0 bottom-0 w-0.5 blur-sm bg-gradient-to-b from-accent/40 via-accent/20 to-transparent" />
+
+            {/* Animated traveling dot */}
+            <div
+              className="absolute left-[22px] md:left-[30px] w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(104,114,214,0.6)] animate-travel-dot"
+            />
+
+            {/* Layers */}
+            <div className="space-y-16">
+              {layers.map((l, i) => (
+                <FadeIn key={l.title} delay={i * 0.08}>
+                  <div className="relative pl-16 md:pl-24">
+                    {/* Horizontal connector */}
+                    <div className="absolute left-6 md:left-8 top-6 w-8 md:w-14 h-0.5 bg-accent/30" />
+                    {/* Dot on the vertical line */}
+                    <div className="absolute left-[20px] md:left-[28px] top-[18px] w-3 h-3 rounded-full bg-deep border-2 border-accent/60" />
+
+                    {/* Background number */}
+                    <span className="absolute right-0 top-[-8px] font-heading text-[4rem] md:text-[5rem] font-bold text-accent/[0.06] leading-none select-none pointer-events-none">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+
+                    {/* Content */}
+                    <div className="relative">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center">
+                          <l.icon size={20} className="text-accent" />
+                        </div>
+                        <h3 className="font-heading text-h2 text-foreground">{l.title}</h3>
                       </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-heading text-h2 text-foreground mb-2">{l.title}</h3>
                       <p className="text-muted text-body leading-relaxed mb-4">{l.desc}</p>
                       <div className="flex flex-wrap gap-2">
                         {l.tech.map((t) => (
@@ -84,12 +105,25 @@ export default function ArchitecturePage() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* Traveling dot animation */}
+      <style jsx>{`
+        @keyframes travel-dot {
+          0% { top: 0%; opacity: 0; }
+          5% { opacity: 1; }
+          95% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-travel-dot {
+          animation: travel-dot 8s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }

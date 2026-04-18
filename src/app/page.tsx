@@ -28,7 +28,7 @@ const HeroScene = dynamic(() => import("@/components/hero-scene"), {
 });
 
 const stats = [
-  { value: 12, suffix: "+", label: "AI projects shipped" },
+  { value: 17, suffix: "+", label: "AI systems shipped" },
   { value: 30, suffix: "+", label: "Production n8n workflows" },
   { value: 105, suffix: "", label: "Telecom use cases mapped" },
   { value: 6, suffix: "", label: "Industries served" },
@@ -192,7 +192,7 @@ export default function HomePage() {
           className="absolute inset-0 z-[1]"
           style={{
             background:
-              "radial-gradient(ellipse 60% 50% at center, rgba(2,2,3,0.85) 0%, rgba(2,2,3,0.6) 30%, transparent 70%)",
+              "radial-gradient(ellipse 70% 55% at center, rgba(2,2,3,0.85) 0%, rgba(2,2,3,0.5) 40%, transparent 75%)",
           }}
         />
 
@@ -292,27 +292,18 @@ export default function HomePage() {
       <section className="py-16 border-y border-border">
         <div className="max-w-7xl mx-auto px-6">
           <FadeIn>
-            <p className="text-center text-xs font-mono text-muted-dim uppercase tracking-widest mb-10">
-              Trusted by teams at
+            <p className="text-center text-xs font-mono text-muted uppercase tracking-widest mb-10">
+              Building with and for
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
-              {[
-                { name: "Ooredoo", width: "w-28" },
-                { name: "Anthropic", width: "w-24" },
-                { name: "Luban Tours", width: "w-28" },
-              ].map((logo) => (
-                <div
-                  key={logo.name}
-                  className={`${logo.width} h-8 flex items-center justify-center`}
-                >
-                  <span className="text-muted/40 font-heading font-semibold text-lg tracking-wide">
-                    {logo.name}
-                  </span>
-                </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-6">
+              {["Anthropic", "Ooredoo", "Luban Tours", "SB Queen's"].map((name) => (
+                <span key={name} className="text-muted/30 font-heading font-semibold text-lg tracking-wide hover:text-muted/50 transition-colors">
+                  {name}
+                </span>
               ))}
             </div>
             <p className="text-center text-xs text-muted-dim mt-8">
-              Anthropic Claude Partner Network · Production systems across 6 industries
+              Anthropic Claude Partner Network · 17+ systems shipped · 6 industries
             </p>
           </FadeIn>
         </div>

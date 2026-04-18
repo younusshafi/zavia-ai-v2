@@ -10,7 +10,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 const PARTICLE_COUNT = 80;
 const CONNECTION_DISTANCE = 2.1;
 const MOUSE_RADIUS = 2.0;
-const DEAD_ZONE_RADIUS = 1.5;
+const DEAD_ZONE_RADIUS = 1.8;
 
 function Particles() {
   const pointsRef = useRef<THREE.Points>(null);

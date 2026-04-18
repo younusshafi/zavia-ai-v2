@@ -8,6 +8,7 @@ import GradientMesh from "@/components/gradient-mesh";
 import NavigationProgress from "@/components/navigation-progress";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://zavia-ai.com"),
   title: {
     default: "Zavia-AI — Enterprise AI Systems, Engineered",
     template: "%s | Zavia-AI",
@@ -41,12 +42,38 @@ export const metadata: Metadata = {
       "Production-grade Claude-powered AI systems for enterprises across the GCC.",
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: "/favicon.svg",
   },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Zavia-AI",
+  url: "https://zavia-ai.com",
+  logo: "https://zavia-ai.com/favicon.svg",
+  description: "AI engineering studio building production-grade Claude-powered systems for enterprises across the GCC.",
+  foundingDate: "2023",
+  founders: [
+    { "@type": "Person", name: "Younus Shafi" },
+    { "@type": "Person", name: "Ghaarib Khurshid" },
+  ],
+  address: [
+    { "@type": "PostalAddress", addressLocality: "Muscat", addressCountry: "OM" },
+    { "@type": "PostalAddress", addressLocality: "Srinagar", addressCountry: "IN" },
+    { "@type": "PostalAddress", addressLocality: "Kuala Lumpur", addressCountry: "MY" },
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "younus@zavia-ai.com",
+    contactType: "sales",
+  },
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -56,6 +83,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script defer data-domain="zavia-ai.com" src="https://plausible.io/js/script.js" />
+      </head>
       <body className="bg-deep text-foreground font-body noise-overlay">
         <GradientMesh />
         <CustomCursor />

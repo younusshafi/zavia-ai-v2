@@ -1,15 +1,16 @@
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { Suspense } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
-const PARTICLE_COUNT = 120;
-const CONNECTION_DISTANCE = 1.8;
+const PARTICLE_COUNT = 80;
+const CONNECTION_DISTANCE = 2.1;
 const MOUSE_RADIUS = 2.0;
+const DEAD_ZONE_RADIUS = 1.5;
 
 function Particles() {
   const pointsRef = useRef<THREE.Points>(null);
@@ -21,13 +22,19 @@ function Particles() {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
     const vel = new Float32Array(PARTICLE_COUNT * 3);
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Random positions in a sphere of radius 4
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 4 * Math.cbrt(Math.random());
-      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pos[i * 3 + 2] = r * Math.cos(phi);
+      // Random positions in a sphere of radius 4, but outside the dead zone
+      let x, y, z, r;
+      do {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        r = DEAD_ZONE_RADIUS + (4 - DEAD_ZONE_RADIUS) * Math.cbrt(Math.random());
+        x = r * Math.sin(phi) * Math.cos(theta);
+        y = r * Math.sin(phi) * Math.sin(theta);
+        z = r * Math.cos(phi);
+      } while (Math.sqrt(x * x + y * y + z * z) < DEAD_ZONE_RADIUS);
+      pos[i * 3] = x;
+      pos[i * 3 + 1] = y;
+      pos[i * 3 + 2] = z;
       vel[i * 3] = (Math.random() - 0.5) * 0.002;
       vel[i * 3 + 1] = (Math.random() - 0.5) * 0.002;
       vel[i * 3 + 2] = (Math.random() - 0.5) * 0.002;
@@ -39,7 +46,7 @@ function Particles() {
   const linePositions = useRef(new Float32Array(PARTICLE_COUNT * PARTICLE_COUNT * 6));
   const lineColors = useRef(new Float32Array(PARTICLE_COUNT * PARTICLE_COUNT * 6));
 
-  // Shader for circular particles
+  // Shader for small, sharp circular particles
   const particleMaterial = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -48,11 +55,10 @@ function Particles() {
           uAccent: { value: new THREE.Color("#6872D6") },
         },
         vertexShader: `
-          attribute float aScale;
           varying float vDist;
           void main() {
             vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = 3.0 * (300.0 / -mvPos.z);
+            gl_PointSize = 2.5 * (300.0 / -mvPos.z);
             gl_Position = projectionMatrix * mvPos;
             vDist = length(position) / 4.0;
           }
@@ -64,9 +70,9 @@ function Particles() {
           void main() {
             float d = length(gl_PointCoord - vec2(0.5));
             if (d > 0.5) discard;
-            float alpha = 1.0 - smoothstep(0.3, 0.5, d);
+            float alpha = smoothstep(0.5, 0.15, d);
             vec3 color = mix(uAccent, uColor, 0.7);
-            gl_FragColor = vec4(color, alpha * 0.8);
+            gl_FragColor = vec4(color, alpha * 0.7);
           }
         `,
         transparent: true,
@@ -95,12 +101,20 @@ function Particles() {
       pos[ix + 1] += velocities[ix + 1];
       pos[ix + 2] += velocities[ix + 2];
 
-      // Contain within sphere
+      // Contain within outer sphere
       const dist = Math.sqrt(pos[ix] ** 2 + pos[ix + 1] ** 2 + pos[ix + 2] ** 2);
       if (dist > 4.5) {
         velocities[ix] *= -1;
         velocities[ix + 1] *= -1;
         velocities[ix + 2] *= -1;
+      }
+
+      // Push out of dead zone
+      if (dist < DEAD_ZONE_RADIUS && dist > 0.01) {
+        const pushFactor = (DEAD_ZONE_RADIUS - dist) / dist * 0.05;
+        pos[ix] += pos[ix] * pushFactor;
+        pos[ix + 1] += pos[ix + 1] * pushFactor;
+        pos[ix + 2] += pos[ix + 2] * pushFactor;
       }
 
       // Mouse attraction (only on non-reduced-motion)
@@ -134,7 +148,7 @@ function Particles() {
           const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
           if (d < CONNECTION_DISTANCE) {
-            const alpha = 1 - d / CONNECTION_DISTANCE;
+            const alpha = (1 - d / CONNECTION_DISTANCE) * 0.5;
             const baseIdx = lineIdx * 6;
 
             linePos[baseIdx] = pos[i * 3];
@@ -195,7 +209,7 @@ function Particles() {
             count={maxLines * 2}
           />
         </bufferGeometry>
-        <lineBasicMaterial vertexColors transparent opacity={0.4} blending={THREE.AdditiveBlending} />
+        <lineBasicMaterial vertexColors transparent opacity={0.25} blending={THREE.AdditiveBlending} />
       </lineSegments>
     </>
   );

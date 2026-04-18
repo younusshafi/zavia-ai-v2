@@ -16,6 +16,7 @@ import {
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
 import AnimatedCounter from "@/components/animated-counter";
 import HeroVisual from "@/components/hero-visual";
+import AmbientBackground from "@/components/ambient-background";
 
 const stats = [
   { value: 12, suffix: "+", label: "AI projects shipped" },
@@ -70,14 +71,11 @@ const projects = [
 
 export default function HomePage() {
   return (
-    <>
+    <div className="relative">
+      <AmbientBackground />
+
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Ambient blobs */}
-        <div className="ambient-blob w-[600px] h-[600px] bg-accent top-[-200px] left-[-100px] animate-glow-pulse" />
-        <div className="ambient-blob w-[500px] h-[500px] bg-emerald bottom-[-150px] right-[-80px] animate-glow-pulse [animation-delay:2s]" />
-        <div className="ambient-blob w-[300px] h-[300px] bg-accent top-[40%] right-[20%] animate-float" />
-
         {/* Grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -365,6 +363,6 @@ export default function HomePage() {
           </FadeIn>
         </div>
       </section>
-    </>
+    </div>
   );
 }

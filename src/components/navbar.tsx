@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
@@ -21,6 +21,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -93,6 +95,12 @@ export default function Navbar() {
             </button>
           </div>
         </div>
+
+        {/* Scroll progress indicator */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-px bg-accent origin-left"
+          style={{ scaleX }}
+        />
       </motion.header>
 
       {/* Mobile Menu */}

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import SmoothScroll from "@/components/smooth-scroll";
+import CustomCursor from "@/components/custom-cursor";
+import GradientMesh from "@/components/gradient-mesh";
+import NavigationProgress from "@/components/navigation-progress";
 
 export const metadata: Metadata = {
   title: {
@@ -53,9 +57,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-deep text-foreground font-body noise-overlay">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <GradientMesh />
+        <CustomCursor />
+        <NavigationProgress />
+        <SmoothScroll>
+          <Navbar />
+          <main className="relative z-[1] min-h-screen">{children}</main>
+          <Footer />
+        </SmoothScroll>
       </body>
     </html>
   );

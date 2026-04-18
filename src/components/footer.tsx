@@ -1,4 +1,9 @@
+"use client";
+
+import { useRef } from "react";
 import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 const companyLinks = [
   { label: "About", href: "/about" },
@@ -14,9 +19,20 @@ const moreLinks = [
 ];
 
 export default function Footer() {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end end"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [30, 0]);
+
   return (
-    <footer className="border-t border-border bg-base/50">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+    <footer ref={ref} className="border-t border-border bg-base/50 relative z-[1]">
+      <motion.div
+        className="max-w-7xl mx-auto px-6 py-16"
+        style={{ y: reduced ? 0 : y }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
@@ -40,7 +56,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {companyLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-muted text-sm hover:text-foreground transition-colors">
+                  <Link href={link.href} className="text-muted text-sm hover:text-foreground transition-colors link-underline">
                     {link.label}
                   </Link>
                 </li>
@@ -53,18 +69,18 @@ export default function Footer() {
             <h4 className="font-heading font-semibold text-foreground text-sm mb-4">Connect</h4>
             <ul className="space-y-2.5">
               <li>
-                <a href="mailto:younus@zavia-ai.com" className="text-muted text-sm hover:text-foreground transition-colors">
+                <a href="mailto:younus@zavia-ai.com" className="text-muted text-sm hover:text-foreground transition-colors link-underline">
                   younus@zavia-ai.com
                 </a>
               </li>
               <li>
-                <a href="mailto:ghaarib.khurshid@zavia-ai.com" className="text-muted text-sm hover:text-foreground transition-colors">
+                <a href="mailto:ghaarib.khurshid@zavia-ai.com" className="text-muted text-sm hover:text-foreground transition-colors link-underline">
                   ghaarib.khurshid@zavia-ai.com
                 </a>
               </li>
               {moreLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-muted text-sm hover:text-foreground transition-colors">
+                  <Link href={link.href} className="text-muted text-sm hover:text-foreground transition-colors link-underline">
                     {link.label}
                   </Link>
                 </li>
@@ -75,14 +91,14 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-muted-dim text-xs">© 2026 Zavia-AI. All rights reserved.</p>
+          <p className="text-muted-dim text-xs">&copy; 2026 Zavia-AI. All rights reserved.</p>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono text-accent bg-accent-subtle px-2 py-0.5 rounded-full border border-accent/20">
               Anthropic Claude Partner Network
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }

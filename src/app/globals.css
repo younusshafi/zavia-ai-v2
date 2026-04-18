@@ -140,6 +140,35 @@
   }
 }
 
+/* Lenis smooth scroll */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+
+/* Custom cursor — desktop only */
+@media (min-width: 1024px) {
+  * { cursor: none !important; }
+}
+
+/* Link underline animation */
+.link-underline {
+  position: relative;
+  display: inline;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #6872D6;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #050506; }

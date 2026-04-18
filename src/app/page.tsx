@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Brain,
   Rocket,
@@ -15,8 +17,15 @@ import {
 } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
 import AnimatedCounter from "@/components/animated-counter";
-import HeroVisual from "@/components/hero-visual";
-import AmbientBackground from "@/components/ambient-background";
+import TextScramble from "@/components/text-scramble";
+import MagneticButton from "@/components/magnetic-button";
+import SectionDivider from "@/components/section-divider";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
+const HeroScene = dynamic(() => import("@/components/hero-scene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const stats = [
   { value: 12, suffix: "+", label: "AI projects shipped" },
@@ -54,31 +63,142 @@ const projects = [
     title: "TelecomGPT",
     desc: "Internal LLM assistant for a major GCC telecom — agent workflows over millions of records.",
     icon: Cpu,
+    stack: ["Claude", "n8n", "Supabase"],
   },
   {
     tag: "Tourism · Deployed",
     title: "Luban Tours AI",
     desc: "Multilingual booking concierge with RAG over 2,000+ tour packages.",
     icon: MessageSquare,
+    stack: ["Claude", "RAG", "WhatsApp"],
   },
   {
     tag: "Operations · Deployed",
     title: "AI Invoice System",
     desc: "End-to-end invoice extraction, validation, and ERP sync with Claude vision.",
     icon: FileSearch,
+    stack: ["Claude Vision", "n8n", "ERP"],
   },
 ];
+
+function HorizontalScrollGallery() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+  const x = useTransform(scrollYProgress, [0.1, 0.9], ["0%", "-50%"]);
+
+  return (
+    <section ref={containerRef} className="py-28 bg-base/50 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        <FadeIn>
+          <div className="flex items-end justify-between mb-16">
+            <div>
+              <span className="section-label">Selected work</span>
+              <h2 className="font-heading text-h1 mt-3">
+                Systems shipping{" "}
+                <span className="text-muted">in production.</span>
+              </h2>
+            </div>
+            <Link
+              href="/projects"
+              className="hidden md:flex items-center gap-1 text-sm text-accent hover:text-accent-light transition-colors link-underline"
+            >
+              All projects <ChevronRight size={16} />
+            </Link>
+          </div>
+        </FadeIn>
+
+        {/* Desktop: horizontal scroll */}
+        <div className="hidden md:block">
+          <motion.div
+            className="flex gap-5"
+            style={{ x: reduced ? "0%" : x }}
+          >
+            {projects.map((proj) => (
+              <Link
+                key={proj.title}
+                href="/projects"
+                className="block glass-card-hover rounded-2xl p-8 group shrink-0 w-[400px]"
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="tech-tag">{proj.tag}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center mb-5">
+                  <proj.icon size={20} className="text-accent" />
+                </div>
+                <h3 className="font-heading text-h3 text-foreground mb-2 group-hover:text-accent transition-colors">
+                  {proj.title}
+                </h3>
+                <p className="text-muted text-sm leading-relaxed mb-4">{proj.desc}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {proj.stack.map((t) => (
+                    <span key={t} className="tech-tag text-[10px]">{t}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1 text-xs text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read case study <ArrowRight size={14} />
+                </div>
+              </Link>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Mobile: vertical stack */}
+        <StaggerContainer className="grid md:hidden gap-5" staggerDelay={0.1}>
+          {projects.map((proj) => (
+            <StaggerItem key={proj.title}>
+              <Link href="/projects" className="block glass-card-hover rounded-2xl p-8 group">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="tech-tag">{proj.tag}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center mb-5">
+                  <proj.icon size={20} className="text-accent" />
+                </div>
+                <h3 className="font-heading text-h3 text-foreground mb-2 group-hover:text-accent transition-colors">
+                  {proj.title}
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">{proj.desc}</p>
+                <div className="mt-6 flex items-center gap-1 text-xs text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read case study <ArrowRight size={14} />
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <div className="mt-8 md:hidden text-center">
+          <Link href="/projects" className="text-sm text-accent flex items-center justify-center gap-1">
+            All projects <ChevronRight size={16} />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   return (
     <div className="relative">
-      <AmbientBackground />
-
       {/* ─── HERO ─── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Three.js neural network background */}
+        <HeroScene />
+
+        {/* Radial vignette overlay */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, transparent 0%, #020203 70%)",
+          }}
+        />
+
         {/* Grid pattern */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.03] z-[1]"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
@@ -86,42 +206,47 @@ export default function HomePage() {
           }}
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-center md:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mb-6"
-            >
-              <span className="section-label">AI Engineering Studio · Muscat · Srinagar · Kuala Lumpur</span>
-            </motion.div>
+        <div className="relative z-10 max-w-5xl mx-auto px-6 pt-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-6"
+          >
+            <span className="section-label">AI Engineering Studio · Muscat · Srinagar · Kuala Lumpur</span>
+          </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="font-heading text-display-sm md:text-display leading-tight mb-6"
-            >
-              Enterprise AI systems,{" "}
-              <span className="gradient-text-accent">engineered.</span>
-            </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="font-heading text-display-sm md:text-display leading-tight mb-6"
+          >
+            Enterprise AI systems,{" "}
+            <TextScramble
+              text="engineered."
+              className="gradient-text-accent"
+              delay={800}
+              speed={40}
+            />
+          </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-muted text-body-lg max-w-2xl mb-10"
-            >
-              We design, build, and deploy production-grade Claude-powered systems — agents, RAG, and automation — for the enterprises shaping the GCC.
-            </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="text-muted text-body-lg max-w-2xl mx-auto mb-10"
+          >
+            We design, build, and deploy production-grade Claude-powered systems — agents, RAG, and automation — for the enterprises shaping the GCC.
+          </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.7 }}
-              className="flex flex-col sm:flex-row items-center md:items-start gap-4"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.7 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <MagneticButton>
               <Link
                 href="/contact?intent=prototype"
                 className="glow-button px-8 py-3.5 rounded-xl font-medium text-sm flex items-center gap-2"
@@ -129,23 +254,18 @@ export default function HomePage() {
                 Request a prototype
                 <ArrowRight size={16} />
               </Link>
-              <Link
-                href="/projects"
-                className="px-8 py-3.5 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-bright hover:text-foreground transition-all"
-              >
-                View projects
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Hero visual — hidden on mobile */}
-          <div className="hidden md:flex items-center justify-center">
-            <HeroVisual />
-          </div>
+            </MagneticButton>
+            <Link
+              href="/projects"
+              className="px-8 py-3.5 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-bright hover:text-foreground transition-all"
+            >
+              View projects
+            </Link>
+          </motion.div>
         </div>
 
         {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-deep to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-deep to-transparent z-[2]" />
       </section>
 
       {/* ─── STATS ─── */}
@@ -165,6 +285,8 @@ export default function HomePage() {
           </StaggerContainer>
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* ─── TRUST STRIP ─── */}
       <section className="py-16 border-y border-border">
@@ -196,6 +318,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ─── WHY ZAVIA ─── */}
       <section className="py-28">
         <div className="max-w-7xl mx-auto px-6">
@@ -223,56 +347,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── PROJECTS ─── */}
-      <section className="py-28 bg-base/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <FadeIn>
-            <div className="flex items-end justify-between mb-16">
-              <div>
-                <span className="section-label">Selected work</span>
-                <h2 className="font-heading text-h1 mt-3">
-                  Systems shipping{" "}
-                  <span className="text-muted">in production.</span>
-                </h2>
-              </div>
-              <Link
-                href="/projects"
-                className="hidden md:flex items-center gap-1 text-sm text-accent hover:text-accent-light transition-colors"
-              >
-                All projects <ChevronRight size={16} />
-              </Link>
-            </div>
-          </FadeIn>
+      <SectionDivider />
 
-          <StaggerContainer className="grid md:grid-cols-3 gap-5" staggerDelay={0.1}>
-            {projects.map((proj) => (
-              <StaggerItem key={proj.title}>
-                <Link href="/projects" className="block glass-card-hover rounded-2xl p-8 h-full group">
-                  <div className="flex items-center gap-2 mb-6">
-                    <span className="tech-tag">{proj.tag}</span>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center mb-5">
-                    <proj.icon size={20} className="text-accent" />
-                  </div>
-                  <h3 className="font-heading text-h3 text-foreground mb-2 group-hover:text-accent transition-colors">
-                    {proj.title}
-                  </h3>
-                  <p className="text-muted text-sm leading-relaxed">{proj.desc}</p>
-                  <div className="mt-6 flex items-center gap-1 text-xs text-accent opacity-0 group-hover:opacity-100 transition-opacity">
-                    Read case study <ArrowRight size={14} />
-                  </div>
-                </Link>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+      {/* ─── PROJECTS (horizontal scroll) ─── */}
+      <HorizontalScrollGallery />
 
-          <div className="mt-8 md:hidden text-center">
-            <Link href="/projects" className="text-sm text-accent flex items-center justify-center gap-1">
-              All projects <ChevronRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <SectionDivider />
 
       {/* ─── PRODUCTS ─── */}
       <section className="py-28">
@@ -300,7 +380,7 @@ export default function HomePage() {
                   </p>
                   <Link
                     href="/contact?intent=prototype"
-                    className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-light transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-light transition-colors link-underline"
                   >
                     Request a prototype <ArrowRight size={14} />
                   </Link>
@@ -324,7 +404,7 @@ export default function HomePage() {
                   </p>
                   <Link
                     href="/contact?intent=prototype"
-                    className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-light transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent-light transition-colors link-underline"
                   >
                     Request a prototype <ArrowRight size={14} />
                   </Link>
@@ -335,24 +415,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* ─── CTA ─── */}
       <section className="py-28 relative overflow-hidden">
         <div className="ambient-blob w-[400px] h-[400px] bg-accent top-[-100px] left-[30%] animate-glow-pulse" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
           <FadeIn>
             <h2 className="font-heading text-h1 mb-4">
-              Ready to ship a <span className="gradient-text-accent">real AI system?</span>
+              Ready to ship a{" "}
+              <TextScramble
+                text="real AI system?"
+                className="gradient-text-accent"
+                delay={200}
+                speed={35}
+              />
             </h2>
             <p className="text-muted text-body-lg mb-10">
               Tell us your problem. We&apos;ll come back with a prototype plan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/contact?intent=prototype"
-                className="glow-button px-8 py-3.5 rounded-xl font-medium text-sm flex items-center gap-2"
-              >
-                Request a prototype <ArrowRight size={16} />
-              </Link>
+              <MagneticButton>
+                <Link
+                  href="/contact?intent=prototype"
+                  className="glow-button px-8 py-3.5 rounded-xl font-medium text-sm flex items-center gap-2"
+                >
+                  Request a prototype <ArrowRight size={16} />
+                </Link>
+              </MagneticButton>
               <Link
                 href="/contact"
                 className="px-8 py-3.5 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-bright hover:text-foreground transition-all"
